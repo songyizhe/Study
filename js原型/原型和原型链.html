@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>原型和原型链</title>
+	</head>
+	<body>
+		
+		<pre>
+			原型prototype：
+				js每个函数都自带该属性，它的值是一个对象，叫原型对象
+				对于构造函数来说，每通过构造函数实例化一个对象，都有隐藏一个属性__proto__，指向该构造函数的原型对象
+				原型对象好比一个公共的区域，可以被每个实例访问到
+				在创建函数的时候，我们如果把方法写进原型对象，它将不会污染全局变量，还可以被每个实例化对象共享
+				原型的作用：为实例化对象提供共享的方法和属性
+			constructor:
+				用来获取对象的构造函数
+			instanceof:
+				运算符用来测试构造函数的prototype属性是否出现在对象的原型链中的任何位置
+			isPrototypeOf():
+				用来判断某个原型对象和某个实例的关系
+			hasOwnProperty():
+				每个实例化对象都有一个hasOwnProperty()方法，用来判断某个属性到底是本地属性还是继承自原型的属性
+				通过构造函数添加的属性或方法叫做本地属性或方法
+			in:
+				该运算符用来判断某个实例是否包含某个属性，不管是不是本地属性（构造函数中声明）
+				
+			原型链
+				当一个对象要调用某个属性或者方法的时候，先从自身找，如果有就使用，没有则向对象的原型中去寻找，有则使用，如果原型对象中还没有，就会去原型的原型去查找，这样就形成了一条原型链；
+				原型链的终点是Object的原型，如果该对象中依然没有找到，则返回undefined；
+				
+		</pre>
+		<script>
+			function People (name, sex, age){
+				this.name = name;
+				this.sex = sex;
+				this.age = age;
+			}
+			// 通过原型对象定义的属性和方法,可以供由此构造函数所实例化的对象共享
+			People.prototype.sayHi = function (){
+				console.log(`我是${this.name},今年${this.age},性别${this.sex}`)
+			}
+			
+			let a = new People('小明', '男', 12)
+			let b = new People('小美', '女', 11)
+			a.sayHi()
+			b.sayHi()
+			console.log(People.prototype); // {sayHi: ƒ, constructor: ƒ}
+			
+			console.log(a.__proto__ === People.prototype); // true
+			
+			// instanceof
+			console.log(a instanceof People, 'instanceof'); // true
+			const c = {}
+			console.log(c instanceof People, 'c instanceof'); // false
+			
+			// isPrototypeOf
+			console.log(People.prototype.isPrototypeOf(a)); // true
+			console.log(People.prototype.isPrototypeOf(b)); // true
+			console.log(People.prototype.isPrototypeOf(c)); // false
+			
+			// hasOwnProperty
+			console.log(a.hasOwnProperty('name'),'hasOwnProperty() name'); // true 是本地属性，通过构造函数添加
+			console.log(a.hasOwnProperty('sayHi'), 'hasOwnProperty() sayHi'); // fales 不是本地属性 通过原型添加
+			
+			// in
+			console.log('name' in a, 'name in a'); // true 
+			console.log('c' in a, 'c in a'); // false 
+			
+			// 原型链
+			// 查找原型链 中是否有hasOwnProperty函数，也就是判断它是否为本地属性
+			console.log('原型链')
+			console.log('a中是否存在hasOwnProperty方法：',a.hasOwnProperty('hasOwnProperty')); // false a中不存在hasOwnProperty方法
+			console.log('a.__proto__中是否存在hasOwnProperty方法：',a.__proto__.hasOwnProperty('hasOwnProperty')); // false a的原型上不存在hasOwnProperty方法
+			console.log('a.__proto__.__proto__中是否存在hasOwnProperty方法：',a.__proto__.__proto__.hasOwnProperty('hasOwnProperty')); // true a的原型的原型（Object）上存在hasOwnProperty方法
+			
+		</script>
+	</body>
+</html>
